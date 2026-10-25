@@ -63,6 +63,13 @@ Managing student records reliably requires secure data validation, idempotent op
 | **AI Extension** | Ollama (`llama3.2:1b`) | Optional local natural-language database query assistant |
 
 ---
+# 🎓 EduTrack — Students Database CRUD Application (+ AI Extension)
+
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://students-database-crud-application.onrender.com/)
+[![API Docs](https://img.shields.io/badge/Swagger-Docs-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://students-database-crud-application.onrender.com/docs)
+
+> **Live Application URL**: [https://students-database-crud-application.onrender.com/](https://students-database-crud-application.onrender.com/)  
+> **Interactive Swagger Docs**: [https://students-database-crud-application.onrender.com/docs](https://students-database-crud-application.onrender.com/docs)
 
 ## 📂 Project Architecture
 
