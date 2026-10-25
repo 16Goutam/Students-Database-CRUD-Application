@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduTrack — Student Management & Analytics</title>
+  
+  <!-- Font and Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --primary-subtle: #eef2ff;
+      --success: #10b981;
+      --success-subtle: #ecfdf5;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --danger-subtle: #fef2f2;
+      --dark: #0f172a;
+      --slate: #475569;
+      --light-gray: #f8fafc;
+      --border: #e2e8f0;
+      --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background-color: #f1f5f9; color: var(--dark); min-height: 100vh; }
+
+    /* Navbar */
+    .navbar {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: var(--primary);
+    }
+    .brand-icon {
+      background: var(--primary);
+      color: #fff;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-swagger {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--light-gray);
+      color: var(--slate);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-swagger:hover { background: #e2e8f0; color: var(--dark); }
+
+    /* Main Container */
+    .container {
+      max-width: 1250px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+
+    /* KPI Stats Bar */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: #ffffff;
+      padding: 1.4rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--card-shadow);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+    .stat-icon.blue { background: var(--primary-subtle); color: var(--primary); }
+    .stat-icon.green { background: var(--success-subtle); color: var(--success); }
+    .stat-icon.purple { background: #f3e8ff; color: #9333ea; }
+    .stat-meta .label { font-size: 0.8rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+    .stat-meta .value { font-size: 1.6rem; font-weight: 800; color: var(--dark); margin-top: 2px; }
+
+    /* Two-column layout */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 1.75rem;
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+      .dashboard-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Card Box */
+    .card {
+      background: #ffffff;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--card-shadow);
+      padding: 1.5rem;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Forms */
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--slate);
+      margin-bottom: 6px;
+    }
+    .form-control {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      background: #ffffff;
+      transition: all 0.2s;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+    }
+    .row-two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 10px 18px;
+      border-radius: 8px;
+      border: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-block { width: 100%; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--slate); }
+    .btn-outline:hover { background: var(--light-gray); color: var(--dark); }
+    .btn-danger-light { background: var(--danger-subtle); color: var(--danger); }
+    .btn-danger-light:hover { background: #fee2e2; }
+    .btn-edit-light { background: var(--primary-subtle); color: var(--primary); }
+    .btn-edit-light:hover { background: #e0e7ff; }
+
+    /* Filters & Search Header */
+    .table-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 1rem;
+      justify-content: space-between;
+    }
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+    }
+    .search-box i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+    }
+    .search-box input {
+      padding-left: 36px;
+    }
+
+    /* Table Styles */
+    .table-responsive {
+      overflow-x: auto;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    th {
+      background: #f8fafc;
+      color: #64748b;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 14px;
+      font-size: 0.88rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover { background-color: #fafbfc; }
+
+    .badge-course {
+      background: #ede9fe;
+      color: #6d28d9;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .badge-id {
+      background: var(--light-gray);
+      color: var(--slate);
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      border: 1px solid var(--border);
+    }
+
+    /* AI Natural Language Query Box */
+    .ai-card {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.3);
+    }
+    .ai-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ai-desc {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      margin-bottom: 12px;
+    }
+    .ai-input-wrap {
+      display: flex;
+      gap: 10px;
+    }
+    .ai-input-wrap input {
+      flex: 1;
+      padding: 11px 16px;
+      border-radius: 8px;
+      border: none;
+      font-size: 0.9rem;
+    }
+    .ai-input-wrap button {
+      background: #0f172a;
+      color: #fff;
+      border: none;
+      padding: 0 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .ai-input-wrap button:hover { background: #1e293b; }
+    .ai-answer-box {
+      margin-top: 14px;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      backdrop-filter: blur(8px);
+      font-size: 0.9rem;
+      display: none;
+      border-left: 4px solid #38bdf8;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+    }
+    .modal-box {
+      background: #ffffff;
+      width: 100%;
+      max-width: 520px;
+      border-radius: var(--radius);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      animation: modalFadeIn 0.2s ease-out;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .modal-header {
+      padding: 1.25rem 1.5rem;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-body { padding: 1.5rem; }
+    .modal-footer {
+      padding: 1rem 1.5rem;
+      background: #f8fafc;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s;
+      z-index: 999;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { border-left: 4px solid var(--success); }
+    .toast.error { border-left: 4px solid var(--danger); }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="navbar">
+    <div class="brand">
+      <div class="brand-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+      <span>EduTrack</span>
+    </div>
+    <div class="nav-actions">
+      <a href="/docs" target="_blank" class="btn-swagger">
+        <i class="fa-solid fa-bolt"></i>
+        <span>FastAPI Docs</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <!-- KPI Metric Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon blue"><i class="fa-solid fa-users"></i></div>
+        <div class="stat-meta">
+          <div class="label">Total Students</div>
+          <div class="value" id="kpiTotal">0</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green"><i class="fa-solid fa-layer-group"></i></div>
+        <div class="stat-meta">
+          <div class="label">Distinct Courses</div>
+          <div class="value" id="kpiCourses">0</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon purple"><i class="fa-solid fa-database"></i></div>
+        <div class="stat-meta">
+          <div class="label">Persistence Engine</div>
+          <div class="value" style="font-size: 1.25rem; font-weight: 700; color: #7e22ce;">SQLite + ORM</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Extension Query Assistant -->
+    <div class="ai-card">
+      <div class="ai-title">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        <span>AI Student Query Assistant (Ollama Extension)</span>
+      </div>
+      <p class="ai-desc">Ask natural-language questions grounded directly on your SQLite records (e.g., <em>"How many students are enrolled?"</em> or <em>"Who is taking AIML?"</em>).</p>
+      <div class="ai-input-wrap">
+        <input type="text" id="aiQueryInput" placeholder="Ask question about student records..." />
+        <button type="button" onclick="askAI()"><i class="fa-solid fa-paper-plane"></i> Ask</button>
+      </div>
+      <div class="ai-answer-box" id="aiAnswerBox">
+        <i class="fa-solid fa-circle-notch fa-spin" id="aiSpinner"></i>
+        <span id="aiAnswerText">Generating answer...</span>
+      </div>
+    </div>
+
+    <!-- Dashboard Content Layout -->
+    <div class="dashboard-grid">
+
+      <!-- Form Column: Add Student -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <i class="fa-solid fa-user-plus" style="color: var(--primary);"></i>
+            <span>Register Student</span>
+          </div>
+        </div>
+
+        <form id="addStudentForm">
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input type="text" id="addName" class="form-control" placeholder="e.g. Goutam Varma" required />
+          </div>
+
+          <div class="row-two">
+            <div class="form-group">
+              <label class="form-label">Date of Birth *</label>
+              <input type="date" id="addDob" class="form-control" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Course</label>
+              <input type="text" id="addCourse" class="form-control" placeholder="e.g. AIML" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email Address *</label>
+            <input type="email" id="addEmail" class="form-control" placeholder="student@example.com" required />
+          </div>
+
+          <div class="row-two">
+            <div class="form-group">
+              <label class="form-label">Phone Number</label>
+              <input type="tel" id="addPhone" class="form-control" placeholder="+91 9876543210" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Enrollment Date</label>
+              <input type="date" id="addEnrollment" class="form-control" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Address / City</label>
+            <input type="text" id="addAddress" class="form-control" placeholder="Bengaluru, Karnataka" />
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block">
+            <i class="fa-solid fa-check"></i>
+            <span>Save Student Record</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Table Column: Search & Manage -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <i class="fa-solid fa-address-book" style="color: var(--primary);"></i>
+            <span>Enrolled Student Directory</span>
+          </div>
+          <button class="btn btn-outline" style="padding: 6px 12px; font-size: 0.8rem;" onclick="fetchStudents()">
+            <i class="fa-solid fa-rotate-right"></i> Refresh
+          </button>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="table-toolbar">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="filterInput" class="form-control" placeholder="Search by name, email, or course..." oninput="handleFilter()" />
+          </div>
+        </div>
+
+        <!-- Directory Table -->
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 50px;">ID</th>
+                <th>Student</th>
+                <th>Course</th>
+                <th>Date of Birth</th>
+                <th>Phone</th>
+                <th style="text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="studentTableBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Edit Student Modal -->
+  <div class="modal-overlay" id="editModalOverlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--dark);">
+          <i class="fa-solid fa-user-pen" style="color: var(--primary); margin-right: 8px;"></i>
+          Update Student Profile
+        </h3>
+        <i class="fa-solid fa-xmark" style="cursor: pointer; color: var(--slate);" onclick="closeEditModal()"></i>
+      </div>
+      <form id="editStudentForm">
+        <div class="modal-body">
+          <input type="hidden" id="editId" />
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" id="editName" class="form-control" required />
+          </div>
+          <div class="row-two">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" id="editEmail" class="form-control" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Course</label>
+              <input type="text" id="editCourse" class="form-control" />
+            </div>
+          </div>
+          <div class="row-two">
+            <div class="form-group">
+              <label class="form-label">Phone</label>
+              <input type="text" id="editPhone" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Address</label>
+              <input type="text" id="editAddress" class="form-control" />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeEditModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-floppy-disk"></i> Save Updates
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Element -->
+  <div class="toast" id="toastBox">
+    <i class="fa-solid fa-circle-check" id="toastIcon"></i>
+    <span id="toastMsg">Operation successful</span>
+  </div>
+
+  <!-- Client-side Logic -->
+  <script>
+    const API = '/students';
+    let allStudents = [];
+
+    // Toast Utility
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toastBox');
+      const icon = document.getElementById('toastIcon');
+      const text = document.getElementById('toastMsg');
+
+      toast.className = `toast ${type} show`;
+      text.textContent = message;
+      icon.className = type === 'success' ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-xmark';
+
+      setTimeout(() => {
+        toast.className = 'toast';
+      }, 3000);
+    }
+
+    // 1. Fetch & Render Students
+    async function fetchStudents() {
+      try {
+        const res = await fetch(API);
+        allStudents = await res.json();
+        updateKPIs(allStudents);
+        renderTable(allStudents);
+      } catch (err) {
+        showToast('Error connecting to backend API', 'error');
+      }
+    }
+
+    function updateKPIs(students) {
+      document.getElementById('kpiTotal').textContent = students.length;
+      const courses = new Set(students.map(s => s.course).filter(Boolean));
+      document.getElementById('kpiCourses').textContent = courses.size;
+    }
+
+    function renderTable(students) {
+      const tbody = document.getElementById('studentTableBody');
+      tbody.innerHTML = '';
+
+      if (students.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 2.5rem; color: #94a3b8;">
+              <i class="fa-regular fa-folder-open" style="font-size: 2rem; margin-bottom: 8px; display: block;"></i>
+              No student profiles found. Add a new record above!
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      students.forEach(s => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><span class="badge-id">#${s.id}</span></td>
+          <td>
+            <div style="font-weight: 700; color: #0f172a;">${escapeHtml(s.name)}</div>
+            <div style="font-size: 0.78rem; color: #64748b;">${escapeHtml(s.email)}</div>
+          </td>
+          <td>
+            ${s.course ? `<span class="badge-course">${escapeHtml(s.course)}</span>` : '<span style="color:#cbd5e1;">—</span>'}
+          </td>
+          <td style="color: #475569;">${s.date_of_birth}</td>
+          <td style="color: #475569;">${s.phone ? escapeHtml(s.phone) : '—'}</td>
+          <td style="text-align: right;">
+            <button class="btn btn-edit-light" style="padding: 6px 10px;" onclick='openEditModal(${JSON.stringify(s)})'>
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button class="btn btn-danger-light" style="padding: 6px 10px;" onclick="deleteStudent(${s.id})">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 2. Real-time Search Filter
+    function handleFilter() {
+      const q = document.getElementById('filterInput').value.toLowerCase();
+      const filtered = allStudents.filter(s => 
+        s.name.toLowerCase().includes(q) ||
+        s.email.toLowerCase().includes(q) ||
+        (s.course && s.course.toLowerCase().includes(q))
+      );
+      renderTable(filtered);
+    }
+
+    // 3. Create Record
+    document.getElementById('addStudentForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        name: document.getElementById('addName').value.trim(),
+        date_of_birth: document.getElementById('addDob').value,
+        email: document.getElementById('addEmail').value.trim(),
+        course: document.getElementById('addCourse').value.trim() || null,
+        phone: document.getElementById('addPhone').value.trim() || null,
+        address: document.getElementById('addAddress').value.trim() || null,
+        enrollment_date: document.getElementById('addEnrollment').value || null
+      };
+
+      try {
+        const res = await fetch(API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          showToast('Student enrolled successfully!');
+          document.getElementById('addStudentForm').reset();
+          fetchStudents();
+        } else {
+          const err = await res.json();
+          showToast(err.detail || 'Could not save student', 'error');
+        }
+      } catch (error) {
+        showToast('Network error while creating record', 'error');
+      }
+    });
+
+    // 4. Edit Modal & Update (PUT / PATCH)
+    function openEditModal(student) {
+      document.getElementById('editId').value = student.id;
+      document.getElementById('editName').value = student.name;
+      document.getElementById('editEmail').value = student.email;
+      document.getElementById('editCourse').value = student.course || '';
+      document.getElementById('editPhone').value = student.phone || '';
+      document.getElementById('editAddress').value = student.address || '';
+      document.getElementById('editModalOverlay').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModalOverlay').style.display = 'none';
+    }
+
+    document.getElementById('editStudentForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('editId').value;
+      const payload = {
+        name: document.getElementById('editName').value.trim(),
+        email: document.getElementById('editEmail').value.trim(),
+        course: document.getElementById('editCourse').value.trim() || null,
+        phone: document.getElementById('editPhone').value.trim() || null,
+        address: document.getElementById('editAddress').value.trim() || null
+      };
+
+      try {
+        const res = await fetch(`${API}/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          showToast(`Student #${id} updated successfully!`);
+          closeEditModal();
+          fetchStudents();
+        } else {
+          const err = await res.json();
+          showToast(err.detail || 'Failed to update student', 'error');
+        }
+      } catch (err) {
+        showToast('Network error during update', 'error');
+      }
+    });
+
+    // 5. Delete Record
+    async function deleteStudent(id) {
+      if (!confirm(`Are you sure you want to permanently delete Student #${id}?`)) return;
+
+      try {
+        const res = await fetch(`${API}/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          showToast(`Student #${id} deleted.`);
+          fetchStudents();
+        } else {
+          showToast('Failed to delete student', 'error');
+        }
+      } catch (err) {
+        showToast('Network error during deletion', 'error');
+      }
+    }
+
+    // 6. Optional AI Query
+    async function askAI() {
+      const q = document.getElementById('aiQueryInput').value.trim();
+      if (!q) return;
+
+      const answerBox = document.getElementById('aiAnswerBox');
+      const textSpan = document.getElementById('aiAnswerText');
+      const spinner = document.getElementById('aiSpinner');
+
+      answerBox.style.display = 'block';
+      spinner.style.display = 'inline-block';
+      textSpan.textContent = ' Analyzing database records with local model...';
+
+      try {
+        const res = await fetch('/students/ai-query', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question: q })
+        });
+        const data = await res.json();
+        spinner.style.display = 'none';
+        textSpan.textContent = data.answer || 'No answer generated.';
+      } catch (err) {
+        spinner.style.display = 'none';
+        textSpan.textContent = 'Local Ollama endpoint is offline. Ensure `ollama run llama3.2:1b` is running.';
+      }
+    }
+
+    function escapeHtml(string) {
+      return String(string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // Initial Load
+    fetchStudents();
+  </script>
+</body>
+</html>
